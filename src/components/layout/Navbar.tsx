@@ -4,8 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ADMIN_UID } from '../../lib/moderation';
 
 const Navbar = () => {
-  const { user } = useAuth();
-  const isAdmin = user?.uid === ADMIN_UID;
+  const { user, profile } = useAuth();
+  const isAdmin = user?.uid === ADMIN_UID || profile?.isAdmin;
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (

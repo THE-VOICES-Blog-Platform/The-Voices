@@ -69,7 +69,7 @@ const Profile = () => {
               <div className="flex items-center gap-3 flex-wrap mb-1">
                 <h1 className="text-4xl font-black font-heading uppercase">{profile.displayName}</h1>
                 <span className="text-xs font-black uppercase tracking-widest px-3 py-1 border-2 border-black bg-black text-[#f4f1ea]">
-                  {isAdmin ? 'Owner' : profile.role}
+                  {profile.isAdmin && uid !== ADMIN_UID ? 'Admin' : (uid === ADMIN_UID ? 'Owner' : profile.role)}
                 </span>
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">{profile.email}</p>

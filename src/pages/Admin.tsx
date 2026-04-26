@@ -14,11 +14,10 @@ const Admin = () => {
   const [banReason, setBanReason] = useState('');
   const [banningUid, setBanningUid] = useState<string | null>(null);
 
-  const isOwner = user?.uid === ADMIN_UID;
-
-  // Allow secondary admins too
   const currentUserProfile = users.find(u => u.uid === user?.uid);
-  const canAccess = isOwner || currentUserProfile?.isAdmin;
+  const isOwner = user?.uid === ADMIN_UID;
+  const canManageRoles = isOwner || currentUserProfile?.isAdmin;
+  const canAccess = canManageRoles;
 
   if (!user || (!loading && !canAccess)) return <Navigate to="/" />;
 
@@ -68,7 +67,7 @@ const Admin = () => {
   const tabs = [
     { key: 'posts', label: 'All Articles', icon: Newspaper },
     { key: 'users', label: 'User Management', icon: Users },
-    ...(isOwner ? [{ key: 'roles', label: 'Roles & Titles', icon: Star }] : []),
+    ...(canManageRoles ? [{ key: 'roles', label: 'Roles & Titles', icon: Star }] : []),
   ] as { key: 'posts' | 'users' | 'roles'; label: string; icon: typeof Newspaper }[];
 
   return (
@@ -159,8 +158,8 @@ const Admin = () => {
                   {u.bannedReason && ` · ${u.bannedReason}`}
                 </div>
               </div>
-              {/* Owner can ban; secondary admins cannot */}
-              {isOwner && u.uid !== ADMIN_UID && (
+              {/* Admins can ban; but cannot ban the owner */}
+              {canManageRoles && u.uid !== ADMIN_UID && (
                 <div className="flex-shrink-0">
                   {u.banned ? (
                     <button onClick={() => handleUnban(u.uid)} className="px-4 py-2 border-2 border-black text-xs font-black uppercase hover:bg-gray-100 flex items-center gap-1">
