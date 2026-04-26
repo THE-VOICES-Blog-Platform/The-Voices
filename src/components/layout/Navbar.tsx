@@ -24,11 +24,9 @@ const Navbar = () => {
         </div>
         
         <Link to="/" className="w-full md:w-1/2 flex justify-center hover:opacity-80 transition-opacity">
-          <img 
-            src="/logo.png" 
-            alt="The Voices" 
-            className="h-28 md:h-40 object-contain"
-          />
+          <h1 className="text-4xl md:text-6xl font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
+            The Voices
+          </h1>
         </Link>
         
         <div className="flex items-center justify-end w-full md:w-1/4 gap-4 mt-4 md:mt-0">
