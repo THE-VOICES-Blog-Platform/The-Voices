@@ -18,53 +18,58 @@ const Navbar = () => {
       </div>
 
       {/* The Masthead */}
-      <div className="w-full flex flex-col lg:flex-row items-center justify-between mb-4 gap-4 lg:gap-0">
-        {/* Left: Quote (Hidden on mobile) */}
-        <div className="hidden lg:flex flex-col items-start flex-1">
-          <p className="font-serif italic text-sm text-gray-600">"All the news that fits our aesthetic"</p>
-        </div>
+      <div className="w-full flex flex-col items-center mb-6">
         
-        {/* Center: Logo */}
-        <Link to="/" className="flex-shrink-0 flex justify-center hover:opacity-80 transition-opacity z-10 px-2 lg:px-4">
-          <h1 className="text-5xl md:text-6xl font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
+        {/* Center: Logo (Full Width Row) */}
+        <Link to="/" className="w-full flex justify-center hover:opacity-80 transition-opacity mb-6">
+          <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
             The Voices
           </h1>
         </Link>
         
-        {/* Right: Actions */}
-        <div className="flex flex-wrap items-center justify-center lg:justify-end flex-1 gap-2 md:gap-4 w-full lg:w-auto z-20">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              const q = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value;
-              if (q.trim()) window.location.href = `/search?q=${encodeURIComponent(q.trim())}`;
-            }}
-            className="flex items-center border border-black px-2 py-1 bg-white focus-within:ring-1 focus-within:ring-black max-w-[140px] md:max-w-none"
-          >
-            <input 
-              name="search"
-              type="text" 
-              placeholder="SEARCH..." 
-              className="w-full md:w-32 bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none placeholder:text-gray-400"
-            />
-            <button type="submit" className="p-1 hover:bg-black hover:text-[#f4f1ea] transition-colors">
-              <Search className="w-4 h-4" />
-            </button>
-          </form>
-          {isAdmin && (
-            <Link to="/admin" title="Admin Panel" className="p-1 border-2 border-transparent hover:border-black hover:bg-black hover:text-[#f4f1ea] transition-colors">
-              <Shield className="w-4 h-4 md:w-5 md:h-5" />
+        {/* Actions & Quote Row */}
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 border-t-2 border-b-2 border-black py-3 px-2">
+          
+          {/* Left: Quote */}
+          <div className="hidden md:block">
+            <p className="font-serif italic text-base md:text-lg text-gray-800 tracking-wide pr-4">"All the news that fits our aesthetic"</p>
+          </div>
+          
+          {/* Right: Actions */}
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 md:gap-4 w-full md:w-auto">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value;
+                if (q.trim()) window.location.href = `/search?q=${encodeURIComponent(q.trim())}`;
+              }}
+              className="flex items-center border border-black px-2 py-1 bg-white focus-within:ring-1 focus-within:ring-black max-w-[140px] md:max-w-none"
+            >
+              <input 
+                name="search"
+                type="text" 
+                placeholder="SEARCH..." 
+                className="w-full md:w-32 bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none placeholder:text-gray-400"
+              />
+              <button type="submit" className="p-1 hover:bg-black hover:text-[#f4f1ea] transition-colors">
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
+            {isAdmin && (
+              <Link to="/admin" title="Admin Panel" className="p-1 border-2 border-transparent hover:border-black hover:bg-black hover:text-[#f4f1ea] transition-colors">
+                <Shield className="w-4 h-4 md:w-5 md:h-5" />
+              </Link>
+            )}
+            <Link to="/write" className="btn-outline flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs whitespace-nowrap">
+              <PenSquare className="w-3 h-3 md:w-4 md:h-4" />
+              Write
             </Link>
-          )}
-          <Link to="/write" className="btn-outline flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 text-[10px] md:text-xs whitespace-nowrap">
-            <PenSquare className="w-3 h-3 md:w-4 md:h-4" />
-            Write
-          </Link>
-          <Link to={user ? "/settings" : "/auth"} className="btn-premium flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 text-[10px] md:text-xs whitespace-nowrap">
-            <User className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden md:inline">{user ? 'Account' : 'Log In / Join'}</span>
-            <span className="md:hidden">{user ? 'Me' : 'Join'}</span>
-          </Link>
+            <Link to={user ? "/settings" : "/auth"} className="btn-premium flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs whitespace-nowrap">
+              <User className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden md:inline">{user ? 'Account' : 'Log In / Join'}</span>
+              <span className="md:hidden">{user ? 'Me' : 'Join'}</span>
+            </Link>
+          </div>
         </div>
       </div>
 
