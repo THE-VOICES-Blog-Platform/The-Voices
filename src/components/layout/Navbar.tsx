@@ -23,7 +23,7 @@ const Navbar = () => {
           <p className="font-serif italic text-sm">"All the news that fits our aesthetic"</p>
         </div>
         
-        <Link to="/" className="w-full md:w-1/2 flex justify-center hover:opacity-80 transition-opacity">
+        <Link to="/" className="w-full md:w-1/2 flex justify-center md:-translate-x-4 hover:opacity-80 transition-opacity">
           <h1 className="text-4xl md:text-6xl font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
             The Voices
           </h1>
@@ -57,8 +57,9 @@ const Navbar = () => {
             <PenSquare className="w-4 h-4" />
             Write
           </Link>
-          <Link to={user ? "/settings" : "/auth"} className="p-1 hover:bg-black hover:text-[#f4f1ea] transition-colors border border-transparent">
-            <User className="w-5 h-5" />
+          <Link to={user ? "/settings" : "/auth"} className="flex items-center gap-2 px-3 py-1 border-2 border-black font-black uppercase text-xs hover:bg-black hover:text-[#f4f1ea] transition-colors">
+            <User className="w-4 h-4" />
+            <span className="hidden lg:inline">{user ? 'Account' : 'Log In / Join'}</span>
           </Link>
           <button className="md:hidden p-1 hover:bg-black hover:text-[#f4f1ea] transition-colors">
             <Menu className="w-5 h-5" />
