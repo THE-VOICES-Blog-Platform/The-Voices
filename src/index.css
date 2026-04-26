@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #f4f1ea;
+  --color-foreground: #1c1c1a;
+  
+  --color-primary: #1c1c1a;
+  --color-primary-foreground: #f4f1ea;
+  
+  --color-accent: #b0a999;
+  
+  --color-card: transparent;
+  --color-card-border: #1c1c1a;
+  
+  --font-sans: 'Georgia', 'Times New Roman', serif;
+  --font-heading: 'Times New Roman', 'Georgia', serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-color: var(--color-background);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-normal;
+  }
+}
+
+@layer utilities {
+  .news-border {
+    @apply border-2 border-foreground;
+  }
+  
+  .news-border-b {
+    @apply border-b-4 border-foreground;
+  }
+
+  .news-border-t {
+    @apply border-t-2 border-foreground;
+  }
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply min-h-[400px] outline-none text-foreground text-lg leading-relaxed font-sans;
+}
+
+.ProseMirror p {
+  @apply mb-4;
+}
+
+.ProseMirror h2 {
+  @apply text-3xl font-bold mt-8 mb-4 text-foreground font-heading uppercase tracking-wide border-b-2 border-foreground pb-2;
+}
+
+.ProseMirror ul {
+  @apply list-disc list-inside mb-4 pl-4;
+}
+
+.ProseMirror ol {
+  @apply list-decimal list-inside mb-4 pl-4;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-foreground pl-4 italic text-gray-700 my-4 font-heading text-xl;
+}
+
+.ProseMirror pre {
+  @apply bg-gray-200 p-4 border border-foreground my-4 overflow-x-auto font-mono text-sm;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+}
