@@ -2,8 +2,7 @@
 
 **The Voices** is a premium blogging platform designed with a bold, brutalist newspaper aesthetic. Built for writers and readers who appreciate high-impact design and a seamless writing experience.
 
-![The Voices Banner](<img width="1069" height="201" alt="image" src="https://github.com/user-attachments/assets/50bf6504-2996-4409-bd17-356bbdf965b0" />
-)
+![The Voices Banner](<img width="1069" height="201" alt="image" src="https://github.com/user-attachments/assets/50bf6504-2996-4409-bd17-356bbdf965b0" />)
 ---
 
 ## ✨ Features
