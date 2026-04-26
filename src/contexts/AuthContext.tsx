@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { type User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { ensureUserProfile } from '../lib/db';
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +25,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      
+      // Ensure profile exists in Firestore when user logs in
+      if (currentUser) {
+        ensureUserProfile(currentUser.uid, currentUser.email || '').catch(console.error);
+      }
+      
       setLoading(false);
     });
 
@@ -44,3 +51,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     </AuthContext.Provider>
   );
 };
+
