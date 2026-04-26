@@ -2,8 +2,8 @@
 
 **The Voices** is a premium blogging platform designed with a bold, brutalist newspaper aesthetic. Built for writers and readers who appreciate high-impact design and a seamless writing experience.
 
-![The Voices Banner](https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3)
-
+![The Voices Banner](<img width="1069" height="201" alt="image" src="https://github.com/user-attachments/assets/50bf6504-2996-4409-bd17-356bbdf965b0" />
+)
 ---
 
 ## ✨ Features
@@ -77,7 +77,7 @@
 
 ## 📸 Screenshots
 
-*Coming soon...*
+<img width="1083" height="909" alt="image" src="https://github.com/user-attachments/assets/0b90dc43-b149-4944-8d3a-dfe0ffb26586" />
 
 ---
 
@@ -99,4 +99,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-Developed with ❤️ by [Your Name](https://github.com/your-username)
+Developed with ❤️ by [CHIRANTAN BAG](https://github.com/Chirantan-2004)
