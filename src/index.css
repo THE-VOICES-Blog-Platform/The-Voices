@@ -46,6 +46,67 @@
   .news-border-t {
     @apply border-t-2 border-foreground;
   }
+
+  /* Aesthetic Neo-Brutalist Buttons */
+  .btn-premium {
+    @apply relative inline-flex items-center justify-center font-black uppercase tracking-widest overflow-hidden transition-all duration-300;
+    border: 3px solid var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-primary-foreground);
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    z-index: 1;
+  }
+  
+  .btn-premium::before {
+    content: '';
+    @apply absolute inset-0 w-full h-full;
+    background: linear-gradient(90deg, #ff3366, #ff9933, #33ccff, #ff3366);
+    background-size: 300% 100%;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .btn-premium:hover::before {
+    opacity: 1;
+    animation: gradient-sweep 3s linear infinite;
+  }
+
+  .btn-premium:hover {
+    color: white;
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .btn-premium:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .btn-outline {
+    @apply relative inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-200;
+    border: 3px solid var(--color-foreground);
+    background-color: transparent;
+    color: var(--color-foreground);
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-foreground);
+    color: var(--color-primary-foreground);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  }
+  
+  .btn-outline:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+  }
+}
+
+@keyframes gradient-sweep {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 /* TipTap Editor Styles */

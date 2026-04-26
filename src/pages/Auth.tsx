@@ -102,7 +102,7 @@ const Auth = () => {
           <div className="flex flex-col gap-4 mt-4">
             <button 
               type="submit" 
-              className="w-full py-4 border-4 border-black bg-black text-[#f4f1ea] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-transparent hover:text-black transition-colors"
+              className="btn-premium w-full py-4 flex gap-2"
             >
               {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
               {isLogin ? 'Log In' : 'Sign Up'}
@@ -117,7 +117,7 @@ const Auth = () => {
             <button 
               type="button"
               onClick={handleGoogleSignIn}
-              className="w-full py-4 border-4 border-black bg-white text-black font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-colors"
+              className="btn-outline w-full py-4 flex gap-2 bg-white"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path

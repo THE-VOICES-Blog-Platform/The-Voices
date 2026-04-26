@@ -91,7 +91,7 @@ const Home = () => {
               dangerouslySetInnerHTML={{ __html: frontPagePost.content.substring(0, 800) + (frontPagePost.content.length > 800 ? '...' : '') }}
             />
 
-            <Link to={`/post/${frontPagePost.id}`} className="mt-6 font-bold uppercase text-xs tracking-wider hover:underline border border-black inline-block w-max px-4 py-2 self-center">
+            <Link to={`/post/${frontPagePost.id}`} className="mt-6 btn-outline px-6 py-3 text-xs self-center">
               Read Full Story &rarr;
             </Link>
           </div>
@@ -119,7 +119,7 @@ const Home = () => {
             <div className="border-4 border-black p-4 text-center">
               <h4 className="font-black text-2xl uppercase tracking-widest mb-2">Write for Us</h4>
               <p className="font-serif italic text-sm mb-3">Join The Voices. Share your story with the world.</p>
-              <Link to="/write" className="inline-block border-2 border-black px-4 py-1 font-bold uppercase text-xs hover:bg-black hover:text-[#f4f1ea] transition-colors">Start Writing</Link>
+              <Link to="/write" className="btn-premium px-6 py-2 text-xs mt-2">Start Writing</Link>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ const Home = () => {
         <div className="py-20 text-center border-4 border-black p-12">
           <h2 className="text-4xl font-black font-heading mb-4 uppercase">Front Page is Empty</h2>
           <p className="font-serif text-xl">The printing presses haven't run yet. Be the first to publish a story.</p>
-          <Link to="/write" className="mt-6 inline-block border-2 border-black px-6 py-2 uppercase font-bold hover:bg-black hover:text-[#f4f1ea] transition-colors">Start Writing</Link>
+          <Link to="/write" className="mt-6 btn-premium px-8 py-4 text-sm">Start Writing</Link>
         </div>
       )}
 

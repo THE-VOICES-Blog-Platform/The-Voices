@@ -56,11 +56,11 @@ const Navbar = () => {
               <Shield className="w-4 h-4 md:w-5 md:h-5" />
             </Link>
           )}
-          <Link to="/write" className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 border-2 border-black font-bold uppercase text-[10px] md:text-xs hover:bg-black hover:text-[#f4f1ea] transition-colors whitespace-nowrap">
+          <Link to="/write" className="btn-outline flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 text-[10px] md:text-xs whitespace-nowrap">
             <PenSquare className="w-3 h-3 md:w-4 md:h-4" />
             Write
           </Link>
-          <Link to={user ? "/settings" : "/auth"} className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 border-2 border-black font-black uppercase text-[10px] md:text-xs hover:bg-black hover:text-[#f4f1ea] transition-colors whitespace-nowrap">
+          <Link to={user ? "/settings" : "/auth"} className="btn-premium flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 text-[10px] md:text-xs whitespace-nowrap">
             <User className="w-3 h-3 md:w-4 md:h-4" />
             <span className="hidden md:inline">{user ? 'Account' : 'Log In / Join'}</span>
             <span className="md:hidden">{user ? 'Me' : 'Join'}</span>
