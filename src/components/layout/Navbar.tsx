@@ -18,21 +18,21 @@ const Navbar = () => {
       </div>
 
       {/* The Masthead */}
-      <div className="w-full flex flex-col lg:flex-row items-center justify-between mb-4 relative">
+      <div className="w-full flex flex-col lg:flex-row items-center justify-between mb-4 gap-4 lg:gap-0">
         {/* Left: Quote (Hidden on mobile) */}
         <div className="hidden lg:flex flex-col items-start flex-1">
           <p className="font-serif italic text-sm text-gray-600">"All the news that fits our aesthetic"</p>
         </div>
         
         {/* Center: Logo */}
-        <Link to="/" className="flex-shrink-0 flex justify-center hover:opacity-80 transition-opacity z-10 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
+        <Link to="/" className="flex-shrink-0 flex justify-center hover:opacity-80 transition-opacity z-10 px-2 lg:px-4">
+          <h1 className="text-5xl md:text-6xl font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
             The Voices
           </h1>
         </Link>
         
         {/* Right: Actions */}
-        <div className="flex flex-wrap items-center justify-center lg:justify-end flex-1 gap-2 md:gap-4 mt-6 lg:mt-0 w-full lg:w-auto z-20">
+        <div className="flex flex-wrap items-center justify-center lg:justify-end flex-1 gap-2 md:gap-4 w-full lg:w-auto z-20">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
