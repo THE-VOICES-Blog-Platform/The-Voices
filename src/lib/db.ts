@@ -163,6 +163,9 @@ export const isUserBanned = async (uid: string): Promise<boolean> => {
 };
 
 export const recordViolation = async (uid: string, email: string) => {
+  if (uid === 'aU3lNVq9wsY8YGyoUlNs2iRvDBq2') {
+    return { violationCount: 0, banned: false };
+  }
   const userRef = doc(db, "users", uid);
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
@@ -242,6 +245,9 @@ export const getAllUsers = async (): Promise<UserProfile[]> => {
 };
 
 export const banUser = async (uid: string, reason: string) => {
+  if (uid === 'aU3lNVq9wsY8YGyoUlNs2iRvDBq2') {
+    throw new Error('Cannot ban the owner.');
+  }
   await setDoc(doc(db, "users", uid), { banned: true, bannedReason: reason }, { merge: true });
 };
 
@@ -250,5 +256,8 @@ export const unbanUser = async (uid: string) => {
 };
 
 export const setUserRole = async (uid: string, role: string, isAdmin: boolean) => {
+  if (uid === 'aU3lNVq9wsY8YGyoUlNs2iRvDBq2') {
+    throw new Error('Cannot change the role of the owner.');
+  }
   await updateDoc(doc(db, "users", uid), { role, isAdmin });
 };

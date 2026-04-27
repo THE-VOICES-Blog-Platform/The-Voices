@@ -7,7 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Heading2, List, ListOrdered, Quote, Code, ArrowLeft, Send, ImagePlus, X, Save } from 'lucide-react';
 import { createPost, updatePost, getPostById, isUserBanned, recordViolation, CATEGORIES } from '../lib/db';
 import { uploadArticleImage } from '../lib/storage';
-import { moderateContent } from '../lib/moderation';
+import { moderateContent, ADMIN_UID } from '../lib/moderation';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MenuBar = ({ editor }: { editor: any }) => {
@@ -97,7 +97,7 @@ const Write = () => {
       const titleCheck = moderateContent(title);
       const bodyCheck = moderateContent(contentHTML);
 
-      if (!titleCheck.isClean || !bodyCheck.isClean) {
+      if ((!titleCheck.isClean || !bodyCheck.isClean) && user.uid !== ADMIN_UID) {
         const result = await recordViolation(user.uid, user.email || 'unknown');
         setModerationError(result.banned
           ? 'Your account has been automatically suspended due to repeated violations.'
