@@ -48,7 +48,6 @@ const Profile = () => {
   if (!profile) return <div className="py-20 text-center font-heading font-black text-2xl uppercase">Correspondent Not Found</div>;
 
   const isOwner = user?.uid === uid;
-  const isAdmin = uid === ADMIN_UID;
 
   return (
     <div className="max-w-4xl mx-auto">

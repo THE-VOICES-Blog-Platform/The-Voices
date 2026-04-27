@@ -61,7 +61,10 @@ const Admin = () => {
     try {
       await setUserRole(uid, role, makeAdmin);
       setUsers(prev => prev.map(u => u.uid === uid ? { ...u, role, isAdmin: makeAdmin } : u));
-    } catch { alert('Failed to update role.'); }
+    } catch (error: any) { 
+      console.error("Error updating role:", error);
+      alert('Failed to update role: ' + (error.message || 'Unknown error')); 
+    }
   };
 
   const tabs = [

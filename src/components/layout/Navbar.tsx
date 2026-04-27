@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, PenSquare, User, Shield, Bell } from 'lucide-react';
+import { Search, PenSquare, User, Shield, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ADMIN_UID } from '../../lib/moderation';
 import { getUserNotifications, markAllNotificationsRead, type AppNotification } from '../../lib/db';

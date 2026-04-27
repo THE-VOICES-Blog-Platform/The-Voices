@@ -69,12 +69,10 @@ export const getPostsByAuthor = async (authorId: string) => {
 };
 
 export const getPostsByCategory = async (category: string) => {
-  let q;
-  if (category.toLowerCase() === 'world') {
-    q = query(collection(db, "posts"), where("isDraft", "==", false));
-  } else {
-    q = query(collection(db, "posts"), where("category", "==", category), where("isDraft", "==", false));
-  }
+  const postsRef = collection(db, "posts");
+  const q = category.toLowerCase() === 'world'
+    ? query(postsRef, where("isDraft", "==", false))
+    : query(postsRef, where("category", "==", category), where("isDraft", "==", false));
   const snapshot = await getDocs(q);
   const posts = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as BlogPost[];
   return posts.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
