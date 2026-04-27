@@ -117,28 +117,58 @@ const Dashboard = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            <h3 className="font-bold uppercase tracking-widest text-sm border-b border-black pb-2">Published Works</h3>
-            {posts.map(post => (
-              <div key={post.id} className="border-2 border-black p-6 bg-white flex flex-col md:flex-row md:items-center justify-between group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all">
-                <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="text-2xl font-black font-heading truncate mb-2">{post.title}</h3>
-                  <div className="flex items-center gap-4 text-xs font-bold uppercase text-gray-600 tracking-wider">
-                    <span>Published: {new Date(post.createdAt.toMillis()).toLocaleDateString()}</span>
-                    <span>•</span>
-                    <span>{post.likesCount} Recommendations</span>
+          <div className="flex flex-col gap-8">
+            {posts.filter(p => p.isDraft).length > 0 && (
+              <div className="flex flex-col gap-4">
+                <h3 className="font-bold uppercase tracking-widest text-sm border-b border-black pb-2">Drafts</h3>
+                {posts.filter(p => p.isDraft).map(post => (
+                  <div key={post.id} className="border-2 border-black p-4 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between group">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <h3 className="text-xl font-black font-heading truncate mb-1">{post.title || 'Untitled Draft'}</h3>
+                      <div className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">
+                        Last edited: {new Date(post.createdAt.toMillis()).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                      <Link to={`/edit/${post.id}`} className="px-3 py-1 bg-black text-[#f4f1ea] font-bold uppercase text-xs hover:bg-gray-800 transition-colors">
+                        Continue
+                      </Link>
+                      <button onClick={() => post.id && handleDelete(post.id)} className="p-1 text-black hover:text-red-600 transition-colors" title="Delete Draft">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 mt-4 md:mt-0">
-                  <Link to={`/edit/${post.id}`} className="p-2 text-black hover:bg-black hover:text-[#f4f1ea] border border-black transition-colors" title="Edit Article">
-                    <PenSquare className="w-5 h-5" />
-                  </Link>
-                  <button onClick={() => post.id && handleDelete(post.id)} className="p-2 text-black hover:bg-black hover:text-[#f4f1ea] border border-black transition-colors" title="Retract Article">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
+                ))}
               </div>
-            ))}
+            )}
+
+            {posts.filter(p => !p.isDraft).length > 0 && (
+              <div className="flex flex-col gap-4">
+                <h3 className="font-bold uppercase tracking-widest text-sm border-b border-black pb-2">Published Works</h3>
+                {posts.filter(p => !p.isDraft).map(post => (
+                  <div key={post.id} className="border-2 border-black p-6 bg-white flex flex-col md:flex-row md:items-center justify-between group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <h3 className="text-2xl font-black font-heading truncate mb-2">{post.title}</h3>
+                      <div className="flex items-center gap-4 text-xs font-bold uppercase text-gray-600 tracking-wider">
+                        <span>Published: {new Date(post.createdAt.toMillis()).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{post.likesCount || 0} Recommendations</span>
+                        <span>•</span>
+                        <span>{post.viewsCount || 0} Views</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                      <Link to={`/edit/${post.id}`} className="p-2 text-black hover:bg-black hover:text-[#f4f1ea] border border-black transition-colors" title="Edit Article">
+                        <PenSquare className="w-5 h-5" />
+                      </Link>
+                      <button onClick={() => post.id && handleDelete(post.id)} className="p-2 text-black hover:bg-black hover:text-[#f4f1ea] border border-black transition-colors" title="Retract Article">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>

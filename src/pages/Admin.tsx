@@ -203,7 +203,7 @@ const Admin = () => {
               <div className="flex flex-col md:flex-row gap-3 flex-shrink-0 items-start md:items-center">
                 <select
                   value={u.role || 'Contributor'}
-                  onChange={e => handleRoleChange(u.uid, e.target.value, u.isAdmin)}
+                  onChange={e => handleRoleChange(u.uid, e.target.value, u.isAdmin || false)}
                   className="border-2 border-black px-3 py-2 font-bold uppercase text-xs bg-white focus:outline-none cursor-pointer"
                 >
                   {ROLES.filter(r => r !== 'Owner').map(r => <option key={r} value={r}>{r}</option>)}
@@ -212,7 +212,7 @@ const Admin = () => {
                   <input
                     type="checkbox"
                     checked={u.isAdmin || false}
-                    onChange={e => handleRoleChange(u.uid, u.role, e.target.checked)}
+                    onChange={e => handleRoleChange(u.uid, u.role || 'Contributor', e.target.checked)}
                     className="w-4 h-4 border border-black accent-black"
                   />
                   Admin Access

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getPostById, likePost, getCommentsByPost, addComment, getUserProfile, followUser, unfollowUser, ensureUserProfile, type BlogPost, type Comment, type UserProfile } from '../lib/db';
+import { getPostById, likePost, incrementPostViews, getCommentsByPost, addComment, getUserProfile, followUser, unfollowUser, ensureUserProfile, savePost, unsavePost, createNotification, type BlogPost, type Comment, type UserProfile } from '../lib/db';
 import { useAuth } from '../contexts/AuthContext';
-import { ArrowLeft, ThumbsUp, Send, UserCircle, UserPlus, UserCheck, PenSquare } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Send, UserCircle, UserPlus, UserCheck, PenSquare, Bookmark, BookmarkCheck } from 'lucide-react';
 import GoogleAd from '../components/ads/GoogleAd';
 import { ADMIN_UID } from '../lib/moderation';
 
@@ -17,6 +17,14 @@ const Post = () => {
   const [loading, setLoading] = useState(true);
   const [hasLiked, setHasLiked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      ensureUserProfile(user.uid, user.email || '').then(setCurrentUserProfile);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!id) return;
@@ -34,6 +42,11 @@ const Post = () => {
           if (user && authorProfile?.followers) {
             setIsFollowing(authorProfile.followers.includes(user.uid));
           }
+          // Increment views
+          if (!sessionStorage.getItem(`viewed_${id}`)) {
+            incrementPostViews(id);
+            sessionStorage.setItem(`viewed_${id}`, 'true');
+          }
         }
       } catch (error) {
         console.error("Error loading post:", error);
@@ -45,11 +58,33 @@ const Post = () => {
   }, [id, user]);
 
   const handleLike = async () => {
-    if (!id || hasLiked) return;
+    if (!id || hasLiked || !user) return;
     try {
       await likePost(id);
       setPost(prev => prev ? { ...prev, likesCount: prev.likesCount + 1 } : null);
       setHasLiked(true);
+      if (post && post.authorId !== user.uid) {
+        await createNotification({
+          userId: post.authorId,
+          type: 'like',
+          title: 'New Recommendation',
+          message: `${currentUserProfile?.displayName || 'Someone'} recommended your article "${post.title}".`,
+          link: `/post/${id}`
+        });
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const handleSaveToggle = async () => {
+    if (!id || !user) return;
+    try {
+      if (isSaved) {
+        await unsavePost(user.uid, id);
+        setIsSaved(false);
+      } else {
+        await savePost(user.uid, id);
+        setIsSaved(true);
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -61,6 +96,13 @@ const Post = () => {
     } else {
       await followUser(author.uid, user.uid);
       setAuthor(prev => prev ? { ...prev, followers: [...prev.followers, user.uid] } : null);
+      await createNotification({
+        userId: author.uid,
+        type: 'follow',
+        title: 'New Follower',
+        message: `${currentUserProfile?.displayName || 'Someone'} started following you.`,
+        link: `/profile/${user.uid}`
+      });
     }
     setIsFollowing(!isFollowing);
   };
@@ -79,8 +121,23 @@ const Post = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         createdAt: { toMillis: () => Date.now() } as any
       }]);
+      if (post && post.authorId !== user.uid) {
+        await createNotification({
+          userId: post.authorId,
+          type: 'comment',
+          title: 'New Letter',
+          message: `${userProfile.displayName || 'Someone'} submitted a letter to your article "${post.title}".`,
+          link: `/post/${id}`
+        });
+      }
     } catch (error) { console.error("Error submitting comment", error); }
   };
+
+  useEffect(() => {
+    if (currentUserProfile && id) {
+      setIsSaved(currentUserProfile.savedPostIds?.includes(id) || false);
+    }
+  }, [currentUserProfile, id]);
 
   if (loading) return <div className="py-20 text-center font-heading font-black text-2xl uppercase">Retrieving from archives...</div>;
   if (!post) return (
@@ -120,7 +177,11 @@ const Post = () => {
             By {author?.displayName || post.authorEmail.split('@')[0]}
             {author?.role && <span className="ml-2 text-xs px-2 py-0.5 border border-black">{author.role}</span>}
           </Link>
-          <span>{new Date(post.createdAt.toMillis()).toLocaleDateString()}</span>
+          <div className="flex gap-4">
+            <span>{new Date(post.createdAt.toMillis()).toLocaleDateString()}</span>
+            <span>•</span>
+            <span>{post.viewsCount || 0} Views</span>
+          </div>
         </div>
 
         <div
@@ -130,15 +191,25 @@ const Post = () => {
 
         <GoogleAd slot="5678901234" style={{ display: 'block', margin: '40px 0' }} />
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex justify-center gap-4">
           <button
             onClick={handleLike}
             disabled={hasLiked}
-            className={`flex items-center gap-2 px-6 py-3 border-4 border-black font-black uppercase tracking-widest transition-all ${hasLiked ? 'bg-black text-[#f4f1ea] shadow-none translate-x-[4px] translate-y-[4px]' : 'bg-white hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}`}
+            className={`flex items-center gap-2 px-6 py-3 border-4 border-black font-black uppercase tracking-widest transition-all ${hasLiked ? 'bg-black text-[#f4f1ea] shadow-none translate-x-[4px] translate-y-[4px]' : 'bg-white hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]'}`}
           >
             <ThumbsUp className="w-5 h-5" />
             {hasLiked ? 'Recommended' : 'Recommend Article'} ({post.likesCount})
           </button>
+          
+          {user && (
+            <button
+              onClick={handleSaveToggle}
+              className={`flex items-center gap-2 px-6 py-3 border-4 border-black font-black uppercase tracking-widest transition-all ${isSaved ? 'bg-black text-[#f4f1ea] shadow-none translate-x-[4px] translate-y-[4px]' : 'bg-white hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]'}`}
+            >
+              {isSaved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
+              {isSaved ? 'Saved' : 'Save'}
+            </button>
+          )}
         </div>
       </article>
 

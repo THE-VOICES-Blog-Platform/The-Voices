@@ -1,12 +1,36 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, PenSquare, User, Shield } from 'lucide-react';
+import { Search, Menu, PenSquare, User, Shield, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ADMIN_UID } from '../../lib/moderation';
+import { getUserNotifications, markAllNotificationsRead, type AppNotification } from '../../lib/db';
 
 const Navbar = () => {
   const { user, profile } = useAuth();
   const isAdmin = user?.uid === ADMIN_UID || profile?.isAdmin;
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchNotifs = async () => {
+      const notifs = await getUserNotifications(user.uid);
+      setNotifications(notifs);
+    };
+    fetchNotifs();
+    // In a real app we'd use onSnapshot, but polling or just fetching on mount is fine for now
+  }, [user]);
+
+  const handleNotificationsClick = async () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications && unreadCount > 0 && user) {
+      await markAllNotificationsRead(user.uid);
+      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+    }
+  };
 
   return (
     <nav className="w-full pt-8 px-4 md:px-8 flex flex-col items-center border-b-[6px] border-black pb-4 mb-8">
@@ -60,6 +84,45 @@ const Navbar = () => {
                 <Shield className="w-4 h-4 md:w-5 md:h-5" />
               </Link>
             )}
+            
+            {user && (
+              <div className="relative">
+                <button 
+                  onClick={handleNotificationsClick}
+                  className="p-1 border-2 border-transparent hover:border-black hover:bg-black hover:text-[#f4f1ea] transition-colors relative"
+                >
+                  <Bell className="w-4 h-4 md:w-5 md:h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full border border-white"></span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50">
+                    <div className="p-2 border-b-2 border-black font-bold uppercase text-xs tracking-widest bg-gray-100">
+                      Alerts
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-xs font-serif italic text-gray-500">No new alerts.</div>
+                      ) : (
+                        notifications.map(n => (
+                          <Link 
+                            key={n.id} 
+                            to={n.link || '#'} 
+                            className={`block p-3 border-b border-gray-200 hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-blue-50/50' : ''}`}
+                            onClick={() => setShowNotifications(false)}
+                          >
+                            <div className="text-[10px] font-bold uppercase tracking-wider mb-1">{n.title}</div>
+                            <div className="text-xs font-serif">{n.message}</div>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <Link to="/write" className="btn-outline flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs whitespace-nowrap">
               <PenSquare className="w-3 h-3 md:w-4 md:h-4" />
               Write

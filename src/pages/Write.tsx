@@ -81,7 +81,7 @@ const Write = () => {
     setCoverPreview(URL.createObjectURL(file));
   };
 
-  const handlePublish = async () => {
+  const handleSave = async (asDraft: boolean) => {
     if (!title.trim() || !editor?.getHTML() || !user) return;
     setModerationError('');
     setIsPublishing(true);
@@ -119,7 +119,8 @@ const Write = () => {
           title,
           content: contentHTML,
           category,
-          coverImageURL
+          coverImageURL,
+          isDraft: asDraft
         });
       } else {
         // Create new post
@@ -129,7 +130,8 @@ const Write = () => {
           category,
           coverImageURL,
           authorId: user.uid,
-          authorEmail: user.email || 'Unknown'
+          authorEmail: user.email || 'Unknown',
+          isDraft: asDraft
         });
       }
       navigate('/dashboard');
@@ -148,13 +150,22 @@ const Write = () => {
           <button onClick={() => navigate(-1)} className="p-2 border-2 border-black hover:bg-black hover:text-[#f4f1ea] transition-colors"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-3xl font-black font-heading uppercase">{id ? 'Editing Desk' : 'Drafting Desk'}</h1>
         </div>
-        <button
-          onClick={handlePublish}
-          disabled={isPublishing || !title.trim()}
-          className="px-8 py-3 border-4 border-black bg-white text-black font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black hover:text-[#f4f1ea] transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-white disabled:hover:text-black"
-        >
-          {isPublishing ? 'Submitting...' : id ? <><Save className="w-5 h-5" />Save Edits</> : <><Send className="w-5 h-5" />Send to Press</>}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleSave(true)}
+            disabled={isPublishing || !title.trim()}
+            className="px-6 py-3 border-4 border-black bg-white text-black font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black hover:text-[#f4f1ea] transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPublishing ? 'Saving...' : <><Save className="w-5 h-5" /> Save Draft</>}
+          </button>
+          <button
+            onClick={() => handleSave(false)}
+            disabled={isPublishing || !title.trim()}
+            className="px-6 py-3 border-4 border-black bg-black text-[#f4f1ea] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-white hover:text-black transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPublishing ? 'Publishing...' : <><Send className="w-5 h-5" /> Publish</>}
+          </button>
+        </div>
       </div>
 
       {moderationError && (

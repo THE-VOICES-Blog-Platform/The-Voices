@@ -12,6 +12,8 @@ export interface BlogPost {
   createdAt: Timestamp;
   likesCount: number;
   violationCount?: number;
+  isDraft?: boolean;
+  viewsCount?: number;
 }
 
 export const CATEGORIES = ['World', 'Politics', 'Business', 'Technology', 'Science', 'Health', 'Sports', 'Arts'] as const;
@@ -28,6 +30,7 @@ export interface UserProfile {
   bannedReason?: string;
   violationCount: number;
   followers: string[];
+  savedPostIds?: string[];
   createdAt: Timestamp;
 }
 
@@ -38,9 +41,11 @@ export const ROLES = ['Owner', 'Editor-in-Chief', 'Senior Reporter', 'Staff Writ
 export const createPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'likesCount'>) => {
   const docRef = await addDoc(collection(db, "posts"), {
     ...post,
+    isDraft: post.isDraft ?? false,
     createdAt: Timestamp.now(),
     likesCount: 0,
     violationCount: 0,
+    viewsCount: 0,
   });
   return docRef.id;
 };
@@ -50,7 +55,8 @@ export const updatePost = async (postId: string, updates: Partial<Omit<BlogPost,
 };
 
 export const getAllPosts = async () => {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  // Only get published posts for general feed
+  const q = query(collection(db, "posts"), where("isDraft", "==", false), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as BlogPost[];
 };
@@ -65,9 +71,9 @@ export const getPostsByAuthor = async (authorId: string) => {
 export const getPostsByCategory = async (category: string) => {
   let q;
   if (category.toLowerCase() === 'world') {
-    q = query(collection(db, "posts"));
+    q = query(collection(db, "posts"), where("isDraft", "==", false));
   } else {
-    q = query(collection(db, "posts"), where("category", "==", category));
+    q = query(collection(db, "posts"), where("category", "==", category), where("isDraft", "==", false));
   }
   const snapshot = await getDocs(q);
   const posts = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as BlogPost[];
@@ -85,6 +91,10 @@ export const deletePost = async (postId: string) => {
 
 export const likePost = async (postId: string) => {
   await updateDoc(doc(db, "posts", postId), { likesCount: increment(1) });
+};
+
+export const incrementPostViews = async (postId: string) => {
+  await updateDoc(doc(db, "posts", postId), { viewsCount: increment(1) });
 };
 
 // ── Comments ───────────────────────────────────────────────────────────────────
@@ -125,6 +135,7 @@ export const ensureUserProfile = async (uid: string, email: string): Promise<Use
       banned: false,
       violationCount: 0,
       followers: [],
+      savedPostIds: [],
       createdAt: Timestamp.now(),
     };
     await setDoc(userRef, profile);
@@ -157,7 +168,7 @@ export const recordViolation = async (uid: string, email: string) => {
   const userRef = doc(db, "users", uid);
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
-    await setDoc(userRef, { uid, email, displayName: email.split('@')[0], photoURL: '', bio: '', role: 'Contributor', isAdmin: false, banned: false, violationCount: 1, followers: [], createdAt: Timestamp.now() });
+    await setDoc(userRef, { uid, email, displayName: email.split('@')[0], photoURL: '', bio: '', role: 'Contributor', isAdmin: false, banned: false, violationCount: 1, followers: [], savedPostIds: [], createdAt: Timestamp.now() });
     return { violationCount: 1, banned: false };
   }
   const current = snap.data().violationCount || 0;
@@ -175,6 +186,54 @@ export const followUser = async (writerUid: string, followerUid: string) => {
 
 export const unfollowUser = async (writerUid: string, followerUid: string) => {
   await updateDoc(doc(db, "users", writerUid), { followers: arrayRemove(followerUid) });
+};
+
+// ── Bookmarks ──────────────────────────────────────────────────────────────────
+
+export const savePost = async (uid: string, postId: string) => {
+  await updateDoc(doc(db, "users", uid), { savedPostIds: arrayUnion(postId) });
+};
+
+export const unsavePost = async (uid: string, postId: string) => {
+  await updateDoc(doc(db, "users", uid), { savedPostIds: arrayRemove(postId) });
+};
+
+// ── Notifications ──────────────────────────────────────────────────────────────
+
+export interface AppNotification {
+  id?: string;
+  userId: string; // The user receiving the notification
+  type: 'like' | 'comment' | 'follow' | 'system';
+  title: string;
+  message: string;
+  link?: string;
+  isRead: boolean;
+  createdAt: Timestamp;
+}
+
+export const createNotification = async (notification: Omit<AppNotification, 'id' | 'createdAt' | 'isRead'>) => {
+  await addDoc(collection(db, "notifications"), {
+    ...notification,
+    isRead: false,
+    createdAt: Timestamp.now(),
+  });
+};
+
+export const getUserNotifications = async (userId: string) => {
+  const q = query(collection(db, "notifications"), where("userId", "==", userId), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as AppNotification[];
+};
+
+export const markNotificationRead = async (notificationId: string) => {
+  await updateDoc(doc(db, "notifications", notificationId), { isRead: true });
+};
+
+export const markAllNotificationsRead = async (userId: string) => {
+  const q = query(collection(db, "notifications"), where("userId", "==", userId), where("isRead", "==", false));
+  const snapshot = await getDocs(q);
+  const promises = snapshot.docs.map(d => updateDoc(doc(db, "notifications", d.id), { isRead: true }));
+  await Promise.all(promises);
 };
 
 // ── Admin ──────────────────────────────────────────────────────────────────────

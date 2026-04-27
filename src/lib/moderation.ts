@@ -25,7 +25,9 @@ export const moderateContent = (text: string): ModerationResult => {
   const violations: string[] = [];
 
   for (const keyword of BANNED_KEYWORDS) {
-    if (plainText.includes(keyword.toLowerCase())) {
+    // Use word boundaries \b to avoid matching partial words like "snaked" for "naked"
+    const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'i');
+    if (regex.test(plainText)) {
       violations.push(keyword);
     }
   }
