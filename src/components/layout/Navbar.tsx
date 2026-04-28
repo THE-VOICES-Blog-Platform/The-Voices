@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, PenSquare, User, Shield, Bell } from 'lucide-react';
+import { Search, PenSquare, User, Shield, Bell, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ADMIN_UID } from '../../lib/moderation';
 import { getUserNotifications, markAllNotificationsRead, type AppNotification } from '../../lib/db';
@@ -12,6 +12,7 @@ const Navbar = () => {
   
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   useEffect(() => {
@@ -21,7 +22,6 @@ const Navbar = () => {
       setNotifications(notifs);
     };
     fetchNotifs();
-    // In a real app we'd use onSnapshot, but polling or just fetching on mount is fine for now
   }, [user]);
 
   const handleNotificationsClick = async () => {
@@ -32,88 +32,93 @@ const Navbar = () => {
     }
   };
 
+  const CATEGORIES = ['World', 'India', 'Politics', 'Business', 'Technology', 'Science', 'Health', 'Sports', 'Arts'];
+
   return (
-    <nav className="w-full pt-8 px-4 md:px-8 flex flex-col items-center border-b-[6px] border-black pb-4 mb-8">
-      {/* Date Header */}
-      <div className="w-full flex justify-between items-center text-xs uppercase tracking-widest font-bold border-b border-t border-black py-1 mb-6">
+    <nav className="w-full sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-card-border">
+      {/* Top ticker bar */}
+      <div className="w-full flex justify-between items-center text-[10px] uppercase tracking-widest font-semibold border-b border-card-border py-1.5 px-4 md:px-8 text-gray-400">
         <span>Vol. 1, No. 1</span>
-        <span>{today}</span>
-        <span>Fifty Cents</span>
+        <span className="hidden md:block">{today}</span>
+        <span className="text-primary font-bold">● LIVE</span>
       </div>
 
-      {/* The Masthead */}
-      <div className="w-full flex flex-col items-center mb-6">
-        
-        {/* Center: Logo (Full Width Row) */}
-        <Link to="/" className="w-full flex justify-center hover:opacity-80 transition-opacity mb-6">
-          <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black font-heading tracking-tighter uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
+      {/* Masthead */}
+      <div className="w-full flex flex-col items-center px-4 md:px-8 pt-5 pb-4">
+        {/* Logo */}
+        <Link to="/" className="w-full flex flex-col items-center hover:opacity-90 transition-opacity mb-1 group">
+          <h1
+            className="text-5xl md:text-7xl lg:text-[6.5rem] font-black font-heading tracking-tighter uppercase text-center leading-none text-foreground group-hover:text-primary transition-colors duration-300"
+            style={{ letterSpacing: '-0.04em' }}
+          >
             The Voices
           </h1>
+          <p className="font-sans italic text-xs md:text-sm text-gray-400 mt-1 tracking-widest uppercase">
+            Stories That Don't Get Headlines
+          </p>
         </Link>
-        
-        {/* Actions & Quote Row */}
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 border-t-2 border-b-2 border-black py-3 px-2">
-          
-          {/* Left: Quote */}
-          <div className="hidden md:block">
-            <p className="font-serif italic text-base md:text-lg text-gray-800 tracking-wide pr-4">"All the news that fits our aesthetic"</p>
-          </div>
-          
+
+        {/* Divider */}
+        <div className="w-full flex items-center gap-3 my-3">
+          <div className="flex-1 h-px bg-card-border" />
+          <span className="text-primary text-xs font-bold uppercase tracking-widest">The Voices</span>
+          <div className="flex-1 h-px bg-card-border" />
+        </div>
+
+        {/* Action Row */}
+        <div className="w-full flex items-center justify-between gap-3">
+          {/* Left: Tagline */}
+          <p className="hidden md:block font-sans italic text-xs text-gray-500 tracking-wide max-w-xs">
+            "While the world scrolls noise, we decode what actually matters."
+          </p>
+
           {/* Right: Actions */}
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 md:gap-4 w-full md:w-auto">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                const q = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value;
-                if (q.trim()) window.location.href = `/search?q=${encodeURIComponent(q.trim())}`;
-              }}
-              className="flex items-center border border-black px-2 py-1 bg-white focus-within:ring-1 focus-within:ring-black max-w-[140px] md:max-w-none"
+          <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3 w-full md:w-auto">
+            {/* Search toggle */}
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className="p-2 border border-card-border text-gray-400 hover:text-foreground hover:border-foreground transition-all"
+              aria-label="Search"
             >
-              <input 
-                name="search"
-                type="text" 
-                placeholder="SEARCH..." 
-                className="w-full md:w-32 bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none placeholder:text-gray-400"
-              />
-              <button type="submit" className="p-1 hover:bg-black hover:text-[#f4f1ea] transition-colors">
-                <Search className="w-4 h-4" />
-              </button>
-            </form>
+              {showSearch ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+            </button>
+
             {isAdmin && (
-              <Link to="/admin" title="Admin Panel" className="p-1 border-2 border-transparent hover:border-black hover:bg-black hover:text-[#f4f1ea] transition-colors">
-                <Shield className="w-4 h-4 md:w-5 md:h-5" />
+              <Link to="/admin" title="Admin Panel" className="p-2 border border-card-border text-gray-400 hover:text-primary hover:border-primary transition-all">
+                <Shield className="w-4 h-4" />
               </Link>
             )}
-            
+
             {user && (
               <div className="relative">
-                <button 
+                <button
                   onClick={handleNotificationsClick}
-                  className="p-1 border-2 border-transparent hover:border-black hover:bg-black hover:text-[#f4f1ea] transition-colors relative"
+                  className="p-2 border border-card-border text-gray-400 hover:text-foreground hover:border-foreground transition-all relative"
                 >
-                  <Bell className="w-4 h-4 md:w-5 md:h-5" />
+                  <Bell className="w-4 h-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full border border-white"></span>
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full border border-background" />
                   )}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 top-full mt-2 w-72 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50">
-                    <div className="p-2 border-b-2 border-black font-bold uppercase text-xs tracking-widest bg-gray-100">
-                      Alerts
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-card border border-card-border shadow-2xl z-50">
+                    <div className="p-2 border-b border-card-border font-bold uppercase text-xs tracking-widest text-gray-400 flex justify-between items-center px-3">
+                      <span>Alerts</span>
+                      {unreadCount > 0 && <span className="text-primary">{unreadCount} new</span>}
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div className="p-4 text-center text-xs font-serif italic text-gray-500">No new alerts.</div>
+                        <div className="p-4 text-center text-xs font-sans italic text-gray-500">No new alerts.</div>
                       ) : (
                         notifications.map(n => (
-                          <Link 
-                            key={n.id} 
-                            to={n.link || '#'} 
-                            className={`block p-3 border-b border-gray-200 hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-blue-50/50' : ''}`}
+                          <Link
+                            key={n.id}
+                            to={n.link || '#'}
+                            className={`block p-3 border-b border-card-border hover:bg-white/5 transition-colors ${!n.isRead ? 'border-l-2 border-l-primary' : ''}`}
                             onClick={() => setShowNotifications(false)}
                           >
-                            <div className="text-[10px] font-bold uppercase tracking-wider mb-1">{n.title}</div>
-                            <div className="text-xs font-serif">{n.message}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-400">{n.title}</div>
+                            <div className="text-xs font-sans text-foreground">{n.message}</div>
                           </Link>
                         ))
                       )}
@@ -123,12 +128,15 @@ const Navbar = () => {
               </div>
             )}
 
-            <Link to="/write" className="btn-outline flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs whitespace-nowrap">
-              <PenSquare className="w-3 h-3 md:w-4 md:h-4" />
+            <Link to="/write" className="flex items-center gap-1.5 px-3 py-1.5 border border-card-border text-gray-300 hover:text-foreground hover:border-foreground transition-all text-[10px] font-bold uppercase tracking-widest">
+              <PenSquare className="w-3 h-3" />
               Write
             </Link>
-            <Link to={user ? "/settings" : "/auth"} className="btn-premium flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs whitespace-nowrap">
-              <User className="w-3 h-3 md:w-4 md:h-4" />
+            <Link
+              to={user ? "/settings" : "/auth"}
+              className="btn-premium flex items-center gap-1.5 px-4 py-1.5 text-[10px] whitespace-nowrap"
+            >
+              <User className="w-3 h-3" />
               <span className="hidden md:inline">{user ? 'Account' : 'Log In / Join'}</span>
               <span className="md:hidden">{user ? 'Me' : 'Join'}</span>
             </Link>
@@ -136,11 +144,43 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Search bar (expandable) */}
+      {showSearch && (
+        <div className="border-t border-card-border px-4 md:px-8 py-3 bg-card">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value;
+              if (q.trim()) { window.location.href = `/search?q=${encodeURIComponent(q.trim())}`; setShowSearch(false); }
+            }}
+            className="flex items-center gap-3 max-w-xl mx-auto"
+          >
+            <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <input
+              name="search"
+              type="text"
+              autoFocus
+              placeholder="Search stories, topics, authors..."
+              className="w-full bg-transparent text-sm font-sans text-foreground focus:outline-none placeholder:text-gray-600 border-b border-card-border pb-1"
+            />
+            <button type="submit" className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">Go</button>
+          </form>
+        </div>
+      )}
+
       {/* Categories Bar */}
-      <div className="w-full border-t-[3px] border-b border-black py-2 mt-4 flex justify-center gap-6 md:gap-12 overflow-x-auto whitespace-nowrap px-4">
-        {['World', 'Politics', 'Business', 'Technology', 'Science', 'Health', 'Sports', 'Arts'].map((cat) => (
-          <Link key={cat} to={`/category/${cat.toLowerCase()}`} className="uppercase font-bold text-xs tracking-widest hover:underline decoration-2 underline-offset-4">
-            {cat}
+      <div className="w-full border-t border-card-border py-2 flex justify-start md:justify-center gap-5 md:gap-8 overflow-x-auto whitespace-nowrap px-4 md:px-8 scrollbar-hide">
+        {CATEGORIES.map((cat) => (
+          <Link
+            key={cat}
+            to={`/category/${cat.toLowerCase()}`}
+            className={`uppercase font-semibold text-[10px] tracking-widest transition-colors pb-1 border-b-2 ${
+              cat === 'India'
+                ? 'border-[#FF9933] text-[#FF9933] hover:text-[#FF9933]'
+                : 'border-transparent text-gray-400 hover:text-foreground hover:border-primary'
+            }`}
+          >
+            {cat === 'India' ? '🇮🇳 India' : cat}
           </Link>
         ))}
       </div>

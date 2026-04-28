@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
 
@@ -10,11 +10,33 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [msg, setMsg] = useState('');
   const navigate = useNavigate();
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address to reset your password.');
+      setMsg('');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMsg('Password reset email sent! Check your inbox.');
+      setError('');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to send password reset email.');
+      } else {
+        setError('Failed to send password reset email.');
+      }
+      setMsg('');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setMsg('');
     
     try {
       if (isLogin) {
@@ -34,6 +56,7 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setError('');
+    setMsg('');
     try {
       await signInWithPopup(auth, googleProvider);
       navigate('/dashboard');
@@ -64,6 +87,12 @@ const Auth = () => {
             {error}
           </div>
         )}
+
+        {msg && (
+          <div className="border-2 border-black bg-green-100 text-green-800 px-4 py-3 mb-6 text-sm font-bold uppercase text-center">
+            {msg}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div>
@@ -79,7 +108,18 @@ const Auth = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-black uppercase tracking-widest text-black mb-2 border-b border-black w-max pb-1">Password</label>
+            <div className="flex justify-between items-end mb-2">
+              <label className="block text-sm font-black uppercase tracking-widest text-black border-b border-black w-max pb-1">Password</label>
+              {isLogin && (
+                <button 
+                  type="button" 
+                  onClick={handleResetPassword}
+                  className="text-xs font-black uppercase hover:underline decoration-2 underline-offset-4"
+                >
+                  Forgot Password?
+                </button>
+              )}
+            </div>
             <div className="relative">
               <input 
                 type={showPassword ? "text" : "password"} 

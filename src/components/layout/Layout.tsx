@@ -9,14 +9,14 @@ const Layout: FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen w-full text-foreground relative">
       {/* Decorative vertical lines mimicking column borders behind everything */}
-      <div className="fixed inset-0 pointer-events-none -z-10 flex justify-center max-w-7xl mx-auto opacity-10">
-        <div className="w-1/4 h-full border-r border-black/30"></div>
-        <div className="w-1/4 h-full border-r border-black/30"></div>
-        <div className="w-1/4 h-full border-r border-black/30"></div>
+      <div className="fixed inset-0 pointer-events-none -z-10 flex justify-center max-w-7xl mx-auto opacity-5">
+        <div className="w-1/4 h-full border-r border-foreground"></div>
+        <div className="w-1/4 h-full border-r border-foreground"></div>
+        <div className="w-1/4 h-full border-r border-foreground"></div>
         <div className="w-1/4 h-full"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto bg-background/90 min-h-screen border-l border-r border-black shadow-2xl">
+      <div className="max-w-6xl mx-auto bg-background min-h-screen border-l border-r border-card-border">
         <Navbar />
         <main className="px-4 md:px-8 py-8 w-full">
           {children}

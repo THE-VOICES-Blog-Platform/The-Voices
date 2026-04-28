@@ -16,7 +16,7 @@ export interface BlogPost {
   viewsCount?: number;
 }
 
-export const CATEGORIES = ['World', 'Politics', 'Business', 'Technology', 'Science', 'Health', 'Sports', 'Arts'] as const;
+export const CATEGORIES = ['World', 'India', 'Politics', 'Business', 'Technology', 'Science', 'Health', 'Sports', 'Arts'] as const;
 
 export interface UserProfile {
   uid: string;

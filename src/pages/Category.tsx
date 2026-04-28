@@ -38,8 +38,10 @@ const Category = () => {
 
   if (loading) {
     return (
-      <div className="w-full py-20 text-center font-bold text-2xl uppercase tracking-widest font-heading animate-pulse">
-        Sifting through the morgue... (Loading {categoryName})
+      <div className="w-full py-24 text-center">
+        <div className="text-xs font-bold uppercase tracking-widest text-gray-500 animate-pulse">
+          ● Loading {categoryName} section...
+        </div>
       </div>
     );
   }
@@ -47,44 +49,56 @@ const Category = () => {
   const getAuthorName = (post: PostWithAuthor) =>
     post.authorProfile?.displayName || post.authorEmail.split('@')[0];
 
+  const isIndia = categoryName?.toLowerCase() === 'india';
+
   return (
     <div className="flex flex-col">
-      <div className="border-b-4 border-black pb-4 mb-8">
-        <h1 className="text-6xl md:text-8xl font-black font-heading uppercase text-center leading-none" style={{ transform: 'scaleY(1.1)' }}>
+      {/* Section Header */}
+      <div className="border-b border-card-border pb-6 mb-10">
+        {isIndia && (
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF9933] mb-3">🇮🇳 India Section</p>
+        )}
+        <h1 className="text-5xl md:text-7xl font-black font-heading uppercase text-foreground leading-none">
           {categoryName}
         </h1>
-        <p className="text-center font-serif italic text-lg mt-2">Latest reports from the field</p>
+        <p className="font-sans text-sm text-gray-500 mt-2">Latest reports from the field</p>
       </div>
 
       {posts.length === 0 ? (
-        <div className="py-20 text-center border-4 border-black p-12 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="text-4xl font-black font-heading mb-4 uppercase">Quiet in the {categoryName} Section</h2>
-          <p className="font-serif text-xl">No stories have broken in this department yet. Our correspondents are on the move.</p>
-          <Link to="/write" className="mt-8 inline-block border-2 border-black px-8 py-3 uppercase font-bold hover:bg-black hover:text-[#f4f1ea] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-            File a Report
-          </Link>
+        <div className="py-20 text-center border border-card-border p-12 bg-card">
+          <div className="text-primary text-xs uppercase tracking-widest mb-4 font-bold">● No stories yet</div>
+          <h2 className="text-3xl font-black font-heading mb-4 uppercase text-foreground">Quiet in the {categoryName} Section</h2>
+          <p className="font-sans text-gray-400 mb-6">No stories have broken here yet. Be the first correspondent.</p>
+          <Link to="/write" className="btn-premium px-8 py-3 text-xs">File a Report</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-card-border border border-card-border">
           {posts.map((post) => (
-            <div key={post.id} className="border-2 border-black p-6 flex flex-col h-full bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all group">
+            <div key={post.id} className="bg-background p-5 flex flex-col group hover:bg-card transition-colors duration-200">
               {post.coverImageURL && (
-                <img src={post.coverImageURL} alt={post.title} className="w-full h-48 object-cover border-2 border-black mb-4" />
+                <div className="overflow-hidden mb-4">
+                  <img src={post.coverImageURL} alt={post.title} className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                </div>
               )}
-              <Link to={`/post/${post.id}`} className="group-hover:opacity-80 transition-opacity flex-1">
-                <h3 className="text-3xl font-black font-heading leading-tight mb-4 group-hover:underline decoration-2 underline-offset-4 uppercase">
+              <div className="mb-2">
+                <span className={`inline-block text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 ${isIndia ? 'bg-[#FF9933] text-black' : 'bg-primary text-foreground'}`}>
+                  {isIndia ? '🇮🇳 ' : ''}{categoryName}
+                </span>
+              </div>
+              <Link to={`/post/${post.id}`} className="flex-1">
+                <h3 className="text-xl font-bold font-heading leading-snug mb-3 text-foreground group-hover:text-primary transition-colors">
                   {post.title}
                 </h3>
-                <div className="text-base font-serif line-clamp-4 text-justify mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
+                <div className="text-sm font-sans text-gray-500 line-clamp-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content }} />
               </Link>
-              <div className="mt-auto pt-4 border-t border-black flex justify-between items-center text-[10px] uppercase font-black tracking-widest text-gray-700">
-                <Link to={`/profile/${post.authorId}`} className="hover:underline flex items-center gap-2">
+              <div className="mt-4 pt-3 border-t border-card-border flex justify-between items-center text-[10px] uppercase font-semibold text-gray-600">
+                <Link to={`/profile/${post.authorId}`} className="hover:text-primary transition-colors flex items-center gap-2">
                   {post.authorProfile?.photoURL && (
-                    <img src={post.authorProfile.photoURL} alt="" className="w-5 h-5 border border-black object-cover" />
+                    <img src={post.authorProfile.photoURL} alt="" className="w-5 h-5 object-cover rounded-full" />
                   )}
                   By {getAuthorName(post)}
                 </Link>
-                <span>{new Date(post.createdAt.toMillis()).toLocaleDateString()}</span>
+                <span>{new Date(post.createdAt.toMillis()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
               </div>
             </div>
           ))}

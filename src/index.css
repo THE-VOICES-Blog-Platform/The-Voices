@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f4f1ea;
-  --color-foreground: #1c1c1a;
+  --color-background: #0a0a0a;
+  --color-foreground: #f4f1ea;
   
-  --color-primary: #1c1c1a;
+  --color-primary: #e60000;
   --color-primary-foreground: #f4f1ea;
   
-  --color-accent: #b0a999;
+  --color-accent: #ff3333;
   
-  --color-card: transparent;
-  --color-card-border: #1c1c1a;
+  --color-card: #121212;
+  --color-card-border: #333333;
   
-  --font-sans: 'Georgia', 'Times New Roman', serif;
-  --font-heading: 'Times New Roman', 'Georgia', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Merriweather', 'Georgia', serif;
 }
 
 @layer base {
@@ -24,7 +24,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-color: var(--color-background);
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -49,19 +49,18 @@
 
   /* Aesthetic Neo-Brutalist Buttons */
   .btn-premium {
-    @apply relative inline-flex items-center justify-center font-black uppercase tracking-widest overflow-hidden transition-all duration-300;
-    border: 3px solid var(--color-foreground);
+    @apply relative inline-flex items-center justify-center font-bold uppercase tracking-widest overflow-hidden transition-all duration-300;
+    border: 1px solid var(--color-foreground);
     background-color: var(--color-foreground);
-    color: var(--color-primary-foreground);
-    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    color: var(--color-background);
     z-index: 1;
   }
   
   .btn-premium::before {
     content: '';
     @apply absolute inset-0 w-full h-full;
-    background: linear-gradient(90deg, #ff3366, #ff9933, #33ccff, #ff3366);
-    background-size: 300% 100%;
+    background: linear-gradient(90deg, #e60000, #ff3333, #e60000);
+    background-size: 200% 100%;
     z-index: -1;
     transition: opacity 0.3s ease;
     opacity: 0;
@@ -73,34 +72,28 @@
   }
 
   .btn-premium:hover {
-    color: white;
-    transform: translate(2px, 2px);
-    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    color: var(--color-foreground);
+    border-color: transparent;
   }
 
   .btn-premium:active {
-    transform: translate(6px, 6px);
-    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+    transform: scale(0.98);
   }
 
   .btn-outline {
-    @apply relative inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-200;
-    border: 3px solid var(--color-foreground);
+    @apply relative inline-flex items-center justify-center font-bold uppercase tracking-widest transition-all duration-200;
+    border: 1px solid var(--color-foreground);
     background-color: transparent;
     color: var(--color-foreground);
-    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
   }
 
   .btn-outline:hover {
     background-color: var(--color-foreground);
-    color: var(--color-primary-foreground);
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+    color: var(--color-background);
   }
   
   .btn-outline:active {
-    transform: translate(4px, 4px);
-    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+    transform: scale(0.98);
   }
 }
 
@@ -115,30 +108,30 @@
 }
 
 .ProseMirror p {
-  @apply mb-4;
+  @apply mb-6;
 }
 
 .ProseMirror h2 {
-  @apply text-3xl font-bold mt-8 mb-4 text-foreground font-heading uppercase tracking-wide border-b-2 border-foreground pb-2;
+  @apply text-3xl font-bold mt-10 mb-4 text-foreground font-heading uppercase tracking-wide border-b border-card-border pb-2;
 }
 
 .ProseMirror ul {
-  @apply list-disc list-inside mb-4 pl-4;
+  @apply list-disc list-inside mb-6 pl-4;
 }
 
 .ProseMirror ol {
-  @apply list-decimal list-inside mb-4 pl-4;
+  @apply list-decimal list-inside mb-6 pl-4;
 }
 
 .ProseMirror blockquote {
-  @apply border-l-4 border-foreground pl-4 italic text-gray-700 my-4 font-heading text-xl;
+  @apply border-l-4 border-primary pl-4 italic text-gray-400 my-6 font-heading text-2xl;
 }
 
 .ProseMirror pre {
-  @apply bg-gray-200 p-4 border border-foreground my-4 overflow-x-auto font-mono text-sm;
+  @apply bg-card p-4 border border-card-border my-6 overflow-x-auto font-mono text-sm;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  @apply text-gray-400 float-left h-0 pointer-events-none;
+  @apply text-gray-500 float-left h-0 pointer-events-none;
 }
