@@ -3,7 +3,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { updateUserProfile, ensureUserProfile, type UserProfile } from '../lib/db';
 import { uploadProfilePicture } from '../lib/storage';
-import { UserCircle, Save, ArrowLeft, Camera } from 'lucide-react';
+import { UserCircle, Save, ArrowLeft, Camera, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 
 const Settings = () => {
   const { user } = useAuth();
@@ -37,10 +37,7 @@ const Settings = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image must be under 5MB.');
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { setError('Image must be under 5MB.'); return; }
     setSelectedFile(file);
     setPreviewURL(URL.createObjectURL(file));
     setError('');
@@ -48,30 +45,19 @@ const Settings = () => {
 
   const handleSave = async () => {
     if (!user) return;
-    if (!displayName.trim()) {
-      setError('Display name cannot be empty.');
-      return;
-    }
-    setSaving(true);
-    setError('');
+    if (!displayName.trim()) { setError('Display name cannot be empty.'); return; }
+    setSaving(true); setError('');
     try {
       let finalPhotoURL = photoURL;
-      if (selectedFile) {
-        finalPhotoURL = await uploadProfilePicture(user.uid, selectedFile);
-      }
-      await updateUserProfile(user.uid, {
-        displayName: displayName.trim(),
-        bio: bio.trim(),
-        role: role.trim(),
-        photoURL: finalPhotoURL,
-      });
+      if (selectedFile) finalPhotoURL = await uploadProfilePicture(user.uid, selectedFile);
+      await updateUserProfile(user.uid, { displayName: displayName.trim(), bio: bio.trim(), role: role.trim(), photoURL: finalPhotoURL });
       setPhotoURL(finalPhotoURL);
       setSelectedFile(null);
       setPreviewURL('');
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
-      console.error("Failed to save profile:", e);
+      console.error('Failed to save profile:', e);
       setError('Failed to save. Check your Cloudinary preset is set to Unsigned.');
     } finally {
       setSaving(false);
@@ -83,144 +69,151 @@ const Settings = () => {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 border-b-4 border-black pb-4 mb-8">
-        <Link to="/dashboard" className="p-2 border-2 border-black hover:bg-black hover:text-[#f4f1ea] transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+      <div className="flex items-center gap-4 border-b border-card-border pb-5 mb-8">
+        <Link to="/dashboard" className="p-2 border border-card-border text-gray-500 hover:text-foreground hover:border-foreground transition-all">
+          <ArrowLeft className="w-4 h-4" />
         </Link>
-        <h1 className="text-4xl font-black font-heading uppercase">Profile Settings</h1>
+        <div>
+          <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-primary mb-0.5">● The Voices</div>
+          <h1 className="text-2xl font-black font-heading uppercase text-foreground">Account Settings</h1>
+        </div>
       </div>
 
-      <div className="border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      {/* Alerts */}
+      {error && (
+        <div className="flex items-start gap-3 bg-red-950/40 border border-red-900/50 px-4 py-3 mb-6 text-sm text-red-400">
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span className="font-sans">{error}</span>
+        </div>
+      )}
+      {saved && (
+        <div className="flex items-start gap-3 bg-green-950/40 border border-green-900/50 px-4 py-3 mb-6 text-sm text-green-400">
+          <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span className="font-sans">Profile saved successfully.</span>
+        </div>
+      )}
 
-        {/* Top section: Photo LEFT, fields RIGHT */}
-        <div className="flex flex-col md:flex-row gap-0 border-b-2 border-black">
-          
-          {/* Left: Avatar */}
-          <div className="flex flex-col items-center justify-center gap-4 p-8 border-b-2 md:border-b-0 md:border-r-2 border-black bg-gray-50 md:w-64 flex-shrink-0">
-            <div className="relative">
+      <div className="flex flex-col gap-6">
+        {/* Avatar section */}
+        <div className="border border-card-border bg-card p-6">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-5 pb-3 border-b border-card-border">
+            Profile Photo
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="relative group flex-shrink-0">
               {avatarSrc ? (
-                <img
-                  src={avatarSrc}
-                  alt="Profile"
-                  className="w-36 h-36 border-4 border-black object-cover"
-                />
+                <img src={avatarSrc} alt="Profile" className="w-24 h-24 object-cover rounded-full border-2 border-card-border" />
               ) : (
-                <div className="w-36 h-36 border-4 border-black bg-gray-200 flex items-center justify-center">
-                  <UserCircle className="w-20 h-20 text-gray-400" />
+                <div className="w-24 h-24 rounded-full border-2 border-card-border bg-background flex items-center justify-center">
+                  <UserCircle className="w-14 h-14 text-gray-700" />
                 </div>
               )}
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-2 -right-2 p-2 bg-black text-[#f4f1ea] border-2 border-black hover:bg-gray-800 transition-colors"
+                className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                 title="Change photo"
               >
-                <Camera className="w-4 h-4" />
+                <Camera className="w-5 h-5 text-foreground" />
               </button>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="text-xs font-black uppercase tracking-widest border-2 border-black px-4 py-2 hover:bg-black hover:text-[#f4f1ea] transition-colors w-full text-center"
-            >
-              Change Photo
-            </button>
-            {selectedFile && (
-              <p className="text-xs text-center text-gray-500 font-mono">{selectedFile.name}</p>
-            )}
-
-            {/* Role badge */}
+            <div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs font-bold uppercase tracking-widest border border-card-border px-4 py-2 text-gray-400 hover:text-foreground hover:border-foreground transition-all"
+              >
+                Change Photo
+              </button>
+              {selectedFile && <p className="text-[10px] text-gray-600 font-sans mt-2">{selectedFile.name}</p>}
+              <p className="text-[10px] text-gray-700 font-sans mt-1">Max size: 5MB</p>
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
             {profile && (
-              <div className="text-center mt-2">
-                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 border-2 border-black inline-block">
+              <div className="ml-auto">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-3 py-1 border border-card-border text-gray-500">
                   {profile.role}
                 </span>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Right: Fields */}
-          <div className="flex-1 p-8 flex flex-col gap-6">
+        {/* Fields */}
+        <div className="border border-card-border bg-card p-6">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-5 pb-3 border-b border-card-border">
+            Public Profile
+          </div>
+          <div className="flex flex-col gap-5">
             {/* Display Name */}
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2 border-b border-black w-max pb-1">
-                Display Name *
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">
+                Display Name <span className="text-primary">*</span>
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={e => setDisplayName(e.target.value)}
-                className="w-full border-2 border-black px-4 py-3 font-serif text-xl bg-transparent focus:outline-none focus:bg-gray-50 transition-colors"
+                className="w-full bg-background border border-card-border px-4 py-3 text-sm text-foreground font-sans focus:outline-none focus:border-primary transition-colors placeholder:text-gray-700"
                 placeholder="Your name as shown on articles"
               />
             </div>
 
-            {/* Role / Title */}
+            {/* Professional Title */}
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2 border-b border-black w-max pb-1">
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">
                 Professional Title / Position
               </label>
               <input
                 type="text"
                 value={role}
                 onChange={e => setRole(e.target.value)}
-                className="w-full border-2 border-black px-4 py-3 font-serif text-xl bg-transparent focus:outline-none focus:bg-gray-50 transition-colors"
+                className="w-full bg-background border border-card-border px-4 py-3 text-sm text-foreground font-sans focus:outline-none focus:border-primary transition-colors placeholder:text-gray-700"
                 placeholder="e.g. Senior Reporter, Political Analyst..."
               />
             </div>
 
             {/* Bio */}
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2 border-b border-black w-max pb-1">
-                Bio
-              </label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Bio</label>
               <textarea
                 value={bio}
                 onChange={e => setBio(e.target.value)}
                 rows={4}
-                className="w-full border-2 border-black px-4 py-3 font-serif text-base bg-transparent resize-none focus:outline-none focus:bg-gray-50 transition-colors"
+                className="w-full bg-background border border-card-border px-4 py-3 text-sm text-foreground font-sans resize-none focus:outline-none focus:border-primary transition-colors placeholder:text-gray-700"
                 placeholder="Tell your readers who you are..."
               />
             </div>
 
             {/* Email (read-only) */}
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest mb-2 border-b border-black w-max pb-1">
-                Email (cannot be changed)
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">
+                Email Address <span className="text-gray-700">(cannot be changed)</span>
               </label>
-              <p className="font-mono text-sm text-gray-500 px-4 py-3 border border-gray-300 bg-gray-50">
+              <p className="font-sans text-sm text-gray-600 px-4 py-3 border border-card-border bg-background/50">
                 {user.email}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="border-t-2 border-black px-8 py-4 bg-black text-[#f4f1ea] font-bold uppercase text-sm tracking-wider text-center">
-            ⚠ {error}
-          </div>
-        )}
-
-        {/* Bottom: Save & Links */}
-        <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50">
+        {/* Actions */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Link
             to={`/profile/${user.uid}`}
-            className="text-sm font-black uppercase tracking-widest hover:underline decoration-2 underline-offset-4 order-2 md:order-1"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary transition-colors"
           >
-            View Public Profile →
+            <ExternalLink className="w-3.5 h-3.5" />
+            View Public Profile
           </Link>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="order-1 md:order-2 px-10 py-4 border-4 border-black bg-black text-[#f4f1ea] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors disabled:opacity-60 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+            className="flex items-center gap-2 px-8 py-3 bg-foreground text-background text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-foreground transition-all disabled:opacity-40"
           >
-            <Save className="w-5 h-5" />
+            {saving ? (
+              <span className="inline-block w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
             {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Changes'}
           </button>
         </div>
