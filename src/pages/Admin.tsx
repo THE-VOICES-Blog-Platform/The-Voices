@@ -3,7 +3,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllPosts, getAllUsers, deletePost, banUser, unbanUser, setUserRole, type BlogPost, type UserProfile, ROLES } from '../lib/db';
 import { ADMIN_UID } from '../lib/moderation';
-import { Shield, Trash2, Ban, UserCheck, ArrowLeft, Newspaper, Users, Star, AlertTriangle, Sparkles, Send, CheckCircle2 } from 'lucide-react';
+import { Shield, Trash2, Ban, UserCheck, ArrowLeft, Newspaper, Users, Star, AlertTriangle, Sparkles, Send, CheckCircle2, Clock } from 'lucide-react';
 import { createPost } from '../lib/db';
 
 const Admin = () => {
@@ -14,7 +14,6 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [banReason, setBanReason] = useState('');
   const [banningUid, setBanningUid] = useState<string | null>(null);
-  const [isPublishing, setIsPublishing] = useState(false);
   const [editorialStatus, setEditorialStatus] = useState<'idle' | 'running' | 'success'>('idle');
 
   const currentUserProfile = users.find(u => u.uid === user?.uid);
@@ -238,9 +237,46 @@ const Admin = () => {
           ))}
         </div>
 
-      ) : (
+      ) : activeTab === 'roles' ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-sans italic text-gray-600 border-b border-card-border pb-4 mb-2">
+            Assign titles and admin powers to your team. Only the Owner can do this.
+          </p>
+          {users.filter(u => u.uid !== ADMIN_UID).map(u => (
+            <div key={u.uid} className="border border-card-border bg-card p-4 flex flex-col md:flex-row md:items-center gap-4 hover:bg-white/5 transition-colors">
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {u.photoURL
+                  ? <img src={u.photoURL} className="w-10 h-10 object-cover rounded-full border border-card-border" alt={u.displayName} />
+                  : <div className="w-10 h-10 rounded-full border border-card-border bg-background flex items-center justify-center text-sm font-black text-gray-600">{u.displayName?.[0]?.toUpperCase()}</div>
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold font-heading text-foreground">{u.displayName || u.email}</h3>
+                <p className="text-[10px] text-gray-600 font-sans">{u.email}</p>
+              </div>
+              <div className="flex flex-col md:flex-row gap-2 flex-shrink-0 items-start md:items-center">
+                <select
+                  value={u.role || 'Contributor'}
+                  onChange={e => handleRoleChange(u.uid, e.target.value, u.isAdmin || false)}
+                  className="bg-background border border-card-border px-3 py-2 font-bold uppercase text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer transition-colors"
+                >
+                  {ROLES.filter(r => r !== 'Owner').map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+                <label className="flex items-center gap-2 font-bold uppercase text-xs cursor-pointer border border-card-border px-3 py-2 text-gray-400 hover:text-foreground hover:border-foreground transition-all">
+                  <input
+                    type="checkbox"
+                    checked={u.isAdmin || false}
+                    onChange={e => handleRoleChange(u.uid, u.role || 'Contributor', e.target.checked)}
+                    className="w-3.5 h-3.5 accent-red-600"
+                  />
+                  Admin Access
+                </label>
+              </div>
+            </div>
+          ))}
         </div>
-      ) : activeTab === 'editorial' ? (
+
+      ) : (
         <div className="flex flex-col gap-6">
           <div className="border border-card-border bg-card p-8 text-center flex flex-col items-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary">
@@ -256,7 +292,6 @@ const Admin = () => {
               <button
                 onClick={async () => {
                   setEditorialStatus('running');
-                  // Simulate an editorial cycle
                   const stories = [
                     {
                       title: "The Physical Ceiling of the Digital Mind",
@@ -300,7 +335,6 @@ const Admin = () => {
                       await createPost(story as any);
                     }
                     setEditorialStatus('success');
-                    // Refresh posts list
                     const updatedPosts = await getAllPosts();
                     setPosts(updatedPosts);
                   } catch (e) {
