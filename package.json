@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "tsx seed.ts"
+    "seed": "tsx seed.ts",
+    "editorial": "tsx publish-editorial.ts"
   },
   "dependencies": {
     "@tiptap/extension-placeholder": "^3.22.4",
@@ -38,6 +39,7 @@
     "globals": "^17.5.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.4",
+    "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10"
